@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const MyApp());
@@ -67,7 +70,25 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter++;
     });
   }
+  void _resetCounter(){
+    setState(() {
+      _counter = 0;
+    });
+    _fetchUsers();
+  }
 
+// api call
+
+Future _fetchUsers() async{
+  final response = await http.get(Uri.parse("http://localhost:3000/users"));
+  print("Response Statuscode: ${response.statusCode}");
+  final json = jsonDecode(response.body);
+  if(json != {}){
+    print({json, 'users'});
+  }else{
+    throw Exception("Api failed");
+  }
+}
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -106,12 +127,38 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              'You have clicked the button this many times:',
+              'You have pressed the button this many times:',
             ),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
+            Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(width: 10.0, color: Color(0xFFFFFFFF)),
+                  right: BorderSide(width: 10.0, color: Color(0xFFFFFFFF)),
+                  bottom: BorderSide(width: 10.0, color: Color(0xFFFFFFFF)),
+                  left: BorderSide(width: 10.0, color: Color(0xFFFFFFFF)),
+                ),
+              ),
+              child: GestureDetector(
+                onTap: _resetCounter,
+                child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.0),
+                decoration: const BoxDecoration(
+                  border: Border(
+                    top: BorderSide(width: 10.0, color: Color(0xFFFFDFDF)),
+                    right: BorderSide(width: 10.0, color: Color(0xFFFF7F7F)),
+                    bottom: BorderSide(width: 10.0, color: Color(0xFFFF7F7F)),
+                    left: BorderSide(width: 10.0, color: Color(0xFFFFDFDF)),
+                  ),
+                  color: Colors.grey
+                ),
+                child: const Text('RESET', textAlign: TextAlign.center, style: TextStyle(color: Colors.black),),
+                ),
+              ),
+            )
           ],
         ),
       ),
